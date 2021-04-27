@@ -22,7 +22,7 @@ namespace Coding_Test.Controllers
             _repo = repo;
         }
 
-        [HttpPost("all")]
+        [HttpGet("all")]
         public ActionResult GetAllUsers()
         {
             var users = _repo.GetAll();

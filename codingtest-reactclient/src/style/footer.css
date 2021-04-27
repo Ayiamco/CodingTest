@@ -1,0 +1,42 @@
+/* footer styles */
+footer {
+  background-color: var(--blue-2);
+  padding: 2em 1em;
+  text-align: center;
+}
+
+footer a {
+  color: white;
+  text-decoration: none;
+  height: 5em;
+  display: flex;
+  flex-direction: columns;
+  justify-content: center;
+  align-items: center;
+}
+
+footer img {
+  width: 2em;
+  height: 2em;
+  margin: 0.5em;
+}
+
+.ft-center {
+  color: white;
+}
+
+.ft-right {
+  color: white;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.ft-left a {
+  margin: 0px 0.5em;
+}
+
+.ft-left {
+  display: flex;
+  justify-content: center;
+}

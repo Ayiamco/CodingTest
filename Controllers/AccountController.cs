@@ -25,7 +25,7 @@ namespace Coding_Test.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            return Content("This is it");
+            return Content("This is testing");
         }
 
         [HttpPost("register")]
@@ -54,7 +54,7 @@ namespace Coding_Test.Controllers
         public ActionResult Login([FromBody] UserLoginDto model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new ResponseDto<string>() { message = "form data failed validation", status = 400 });
+                return BadRequest(new ResponseDto<string>() { message = "{\"email\":\"form data failed validation\"}", status = 400 });
 
             try
             {
@@ -69,13 +69,13 @@ namespace Coding_Test.Controllers
 
                 });
 
-                if(result == RepoResult.NotExist)   return BadRequest(new ResponseDto<string>() { status = 400, message = "user does not exist" });
+                if(result == RepoResult.NotExist)   return BadRequest(new ResponseDto<string>() { status = 400, message = "{\"email\":\"email does not exist\"}" });
 
-                return BadRequest(new ResponseDto<string>() { status = 400, message = "password is incorrect" });
+                return BadRequest(new ResponseDto<string>() { status = 400, message = "{\"password\":\"password is incorrect\"}" });
             }
             catch(Exception e)
             {
-                return StatusCode(500, new ResponseDto<string>() { status = 500, message = "internal server error" });
+                return StatusCode(500, new ResponseDto<string>() { status = 500, message = "{\"summary\":\"internal server error\"}" });
 
             }
         }

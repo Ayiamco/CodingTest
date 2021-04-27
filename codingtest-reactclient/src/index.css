@@ -1,0 +1,103 @@
+/* global styles and variables */
+:root {
+  --blue-1: #234095;
+  --gray-1: #fafafa;
+  --gray-2: #d3d4d9;
+  --blue-2: rgb(2, 2, 37);
+  --page-body-height-ss: calc(100vh - 280px);
+  --page-body-height-ls: calc(100vh - 165px);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  padding: 0em;
+  margin: 0em;
+  box-sizing: border-box;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+h1,
+h2 {
+  font-family: "Ubuntu", sans-serif;
+}
+
+h2 {
+  color: var(--blue-1);
+  font-size: 2em;
+  text-align: center;
+}
+
+a {
+  text-decoration: none !important;
+}
+
+img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.page-body {
+  min-height: var(--page-body-height-ss);
+  margin: 0;
+  padding: 0;
+  background-color: rgb(248, 248, 255);
+  margin: 0;
+  padding: 0;
+}
+
+.div-centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.self-centered {
+  display: grid !important;
+  justify-content: center !important;
+}
+
+.p-top {
+  padding-top: 1.5em;
+}
+
+.m-top {
+  margin-top: 1.5em;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.h-100 {
+  height: 100%;
+}
+.details-page {
+  overflow-x: scroll;
+  width: 80vw;
+  margin: auto;
+}
+@media only screen and (min-width: 500px) {
+  .page-body {
+    min-height: var(--page-body-height-ls);
+  }
+  .details-page {
+    overflow: hidden;
+  }
+  .page-body-index {
+    padding: 2em 0;
+  }
+}

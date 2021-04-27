@@ -89,7 +89,8 @@ namespace Coding_Test
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            app.UseCors("allowOrigin");
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
