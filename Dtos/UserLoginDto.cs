@@ -16,7 +16,7 @@ namespace Coding_Test.Dtos
         public string Email { get; set; }
     }
 
-    public class LoginResponse
+    public class AuthResponse
     {
         public string Token { get; set; }
         public string RefreshToken { get; set; }

@@ -66,11 +66,11 @@ namespace Coding_Test.Controllers
                 if (result == RepoResult.Success)
                 {
                     var newRefreshToken = _repo.ResetRefreshToken(model.Email);
-                    return StatusCode(200, new ResponseDto<LoginResponse>()
+                    return StatusCode(200, new ResponseDto<AuthResponse>()
                     {
                         message = "sign in successful",
                         status = 200,
-                        data = new LoginResponse
+                        data = new AuthResponse
                         {
                             RefreshToken=newRefreshToken,
                             Token = _jwtMananager.GetToken(model.Email)
@@ -91,7 +91,7 @@ namespace Coding_Test.Controllers
         }
 
         [HttpPost("refreshToken")]
-        public ActionResult RefreshToken([FromBody] LoginResponse token)
+        public ActionResult RefreshToken([FromBody] AuthResponse token)
         {
             try
             {
@@ -100,12 +100,12 @@ namespace Coding_Test.Controllers
                 var newJwt = _jwtMananager.RefreshJwt(claim.Identity.Name, token.RefreshToken, refreshToken);
                 var newRefreshToken = _repo.ResetRefreshToken(claim.Identity.Name);
 
-                return StatusCode(200, new ResponseDto<LoginResponse>
+                return StatusCode(200, new ResponseDto<AuthResponse>
                 {
                     status = 200,
                     message = "code refresh successfull",
-                    data = new LoginResponse{
-                                RefreshToken=newRefreshToken,
+                    data = new AuthResponse{
+                                RefreshToken=newRefreshToken, 
                                 Token= newJwt
                            }
                 });
