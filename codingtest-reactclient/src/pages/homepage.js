@@ -6,7 +6,7 @@ import Loginform from "../components/loginform";
 export default function Homepage() {
     return (
         <div>
-            <Header></Header>
+            <Header isLoginPage={true}></Header>
             <div className="page-body">
                 <Loginform></Loginform>
             </div>

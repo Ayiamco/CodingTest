@@ -39,7 +39,7 @@ namespace Coding_Test
                 options.AddPolicy(name: "allowOrigin",
                                   build =>
                                   {
-                                      build.WithOrigins(Configuration["reactWebClientUrl"])
+                                      build.WithOrigins(Configuration[AppConstants.WebClientUrl])
                                            .AllowAnyHeader()
                                            .AllowAnyMethod()
                                            .AllowCredentials();
@@ -47,7 +47,7 @@ namespace Coding_Test
             });
 
             //add the jwt interface to enable injection
-            var key = Configuration["CondingTestTokenKey:jwtKey"]; //this is the key used during the hashing 
+            var key = Configuration[AppConstants.JwtKey]; //this is the key used during the hashing 
 
             services.AddAuthentication(x =>
             {

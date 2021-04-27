@@ -1,4 +1,5 @@
 ﻿using Coding_Test.Dtos;
+using Coding_Test.Infrastructure;
 using Coding_Test.Interfaces;
 using Coding_Test.Repositories;
 using Microsoft.AspNetCore.Http;
@@ -95,7 +96,7 @@ namespace Coding_Test.Controllers
         {
             try
             {
-                var claim = _jwtMananager.GetPrincipalFromExpiredToken(token.Token, _configManager["CondingTestTokenKey:jwtKey"]);
+                var claim = _jwtMananager.GetPrincipalFromExpiredToken(token.Token, _configManager[AppConstants.JwtKey]);
                 var refreshToken = _repo.GetRefreshToken(claim.Identity.Name);
                 var newJwt = _jwtMananager.RefreshJwt(claim.Identity.Name, token.RefreshToken, refreshToken);
                 var newRefreshToken = _repo.ResetRefreshToken(claim.Identity.Name);

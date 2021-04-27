@@ -8,6 +8,6 @@ namespace Coding_Test.Infrastructure
     public class AppConstants
     {
         public const string JwtKey = "jwtKey";
-        public const string WebClientUrl = "reactWebClientUrl";
+        public const string WebClientUrl = "WebClientUrl";
     }
 }
