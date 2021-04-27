@@ -1,5 +1,5 @@
 import React,{useState} from 'react';
-import {useHistory} from "react-router-dom";
+import {useHistory,Link} from "react-router-dom";
 import "../style/header.css";
 import logo from "../images/logo.png"
 export default function Header() {
@@ -35,8 +35,7 @@ export default function Header() {
             <nav id={navId}>
                 <a href="" className="nav-link">About Us</a>
                 <a href="" className="nav-link">Services</a>
-                <a href="" className="nav-link">Our Approach</a>
-                <a href="" className="nav-link">Careers</a>
+                <Link className="nav-link" to="/careers">Careers</Link>
                 <a href="" className="nav-link" onClick={logOut} >Log Out</a>
                 
             </nav>

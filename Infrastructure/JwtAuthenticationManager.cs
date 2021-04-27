@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using Coding_Test.Interfaces;
 using Coding_Test.Dtos;
+using System.Security.Cryptography;
 
 namespace Coding_Test.Infrastructure
 {
@@ -20,7 +21,7 @@ namespace Coding_Test.Infrastructure
             this.encryptionKey = encryptionKey;
         }
 
-        public string GetToken(UserLoginDto _user)
+        public string GetToken(string _userEmail)
         {
             //create security token handler
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -31,7 +32,7 @@ namespace Coding_Test.Infrastructure
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, _user.Email),
+                    new Claim(ClaimTypes.Name, _userEmail),
                         
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(5),
@@ -45,6 +46,39 @@ namespace Coding_Test.Infrastructure
 
         }
 
+        public string RefreshJwt(string userEmail, string refreshToken,string savedRefreshToken)
+        {
+            if (savedRefreshToken != refreshToken)
+                throw new SecurityTokenException("Invalid refresh token");
 
+            var newJwtToken = GetToken(userEmail);
+            return newJwtToken;
+        }
+
+        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token, string key)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false, //you might want to validate the audience and issuer depending on your use case
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                ValidateLifetime = false //here we are saying that we don't care about the token's expiration date
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            SecurityToken securityToken;
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
+            var jwtSecurityToken = securityToken as JwtSecurityToken;
+            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
+
+            return principal;
+        }
+
+        //private string GetRefreshTokenFromDb()
+        //{
+
+        //}
     }
 }

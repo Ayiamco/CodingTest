@@ -8,6 +8,7 @@ using AutoMapper;
 using Coding_Test.Entities;
 using Coding_Test.Interfaces;
 using Coding_Test.Dtos;
+using Microsoft.AspNetCore.Http;
 
 namespace Coding_Test.Repositories
 {
@@ -45,12 +46,10 @@ namespace Coding_Test.Repositories
 
         public RepoResult SignIn(UserLoginDto dto)
         {
-            var userInDb = _context.Users.Where(x => x.Email == dto.Email);
-            if (userInDb.Count() != 1) return RepoResult.NotExist;
-           
-
-           var userPasswordHash = HelperMethods.HashPassword(dto.Password);
-           if (userPasswordHash != userInDb.Single().Password) return RepoResult.Failure;
+            var userInDb = _context.Users.Where(x => x.Email == dto.Email).SingleOrDefault();
+            var userPasswordHash = HelperMethods.HashPassword(dto.Password);
+            if (userInDb== null) return RepoResult.NotExist;
+            if (userPasswordHash != userInDb.Password) return RepoResult.Failure;
 
             return RepoResult.Success;
 
@@ -65,6 +64,20 @@ namespace Coding_Test.Repositories
             }).AsQueryable().ToList();
 
             return users;
+        }
+
+        public string GetRefreshToken(string userEmail)
+        {
+            return _context.Users.Where(x => x.Email == userEmail).Single().RefreshToken; ;
+        }
+
+        public string ResetRefreshToken(string userEmail)
+        {
+            var user=_context.Users.Where(x => x.Email == userEmail).Single();
+           var token= HelperMethods.GetRefreshToken();
+            user.RefreshToken = token;
+            _context.SaveChanges();
+            return token;
         }
     }
 }

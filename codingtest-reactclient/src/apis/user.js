@@ -22,6 +22,29 @@ export const  loginUser = async (formData)=>{
     return resp;
 }
 
+export const  tryRefreshToken = async ()=>{
+    let resp =await fetch(baseUrl+"/account/refreshtoken",{
+            method:"POST",
+            headers:{
+                "Content-Type":'application/json; charset=utf-8',
+            },
+            mode:'cors',
+            body: JSON.stringify({
+                "token":localStorage.getItem("token"),
+                "refreshToken":localStorage.getItem("refreshToken"),
+                
+            })
+        }).then(res=> {
+            return res.json()
+        }).catch( (e)=>{
+            return {
+                    status:500
+                };
+        })
+
+    return resp;
+}
+
 export const  getDetails = async ()=>{
     let resp =await fetch(baseUrl+"/user/all",{
             headers:{

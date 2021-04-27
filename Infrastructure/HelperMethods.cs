@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace Coding_Test.Infrastructure
@@ -20,6 +21,16 @@ namespace Coding_Test.Infrastructure
                 iterationCount: 10000,
                 numBytesRequested: 256 / 8));
             return hashed;
+        }
+
+        public static string GetRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using (var generator = RandomNumberGenerator.Create())
+            {
+                generator.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
         }
     }
 }

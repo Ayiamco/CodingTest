@@ -1,5 +1,6 @@
 import React from 'react';
 import {BrowserRouter as Router,Route,Switch,Redirect} from "react-router-dom";
+import CareersPage from './pages/careersPage';
 import DetailsPage from "./pages/detailsPage";
 import Homepage from "./pages/homepage";
 
@@ -29,6 +30,7 @@ function App() {
         
         {/* Protected routes list */}
       <ProtectedRoute exact path="/details" component={DetailsPage}></ProtectedRoute>
+      <ProtectedRoute exact path="/careers" component={CareersPage}></ProtectedRoute>
       </Switch>
 
     </Router>

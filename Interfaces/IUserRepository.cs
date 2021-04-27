@@ -11,7 +11,8 @@ namespace Coding_Test.Interfaces
         Task<User> CreateAsync(RegisterDto dto);
 
         RepoResult SignIn(UserLoginDto dto);
-
+        public string ResetRefreshToken(string userEmail);
         List<UsersListDto> GetAll();
+        public string GetRefreshToken(string userEmail);
     }
 }

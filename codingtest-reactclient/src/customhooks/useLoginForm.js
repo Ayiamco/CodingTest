@@ -24,6 +24,7 @@ export default function useLoginForm() {
         setIsRequesting(false);
         if(resp.status===200){
             localStorage.setItem("token",resp.data.token)
+            localStorage.setItem('refreshToken',resp.data.token)
             if(localStorage.getItem("returnUrl")) history.push(localStorage.getItem("returnUrl"));
             else history.push("/details");
             return;

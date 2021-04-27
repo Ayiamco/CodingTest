@@ -3,6 +3,8 @@ using Coding_Test.Interfaces;
 using Coding_Test.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +18,12 @@ namespace Coding_Test.Controllers
     {
         private IUserRepository _repo;
         private IJwtAuthenticationManager _jwtMananager;
-        public AccountController(IUserRepository repo,IJwtAuthenticationManager jwtManager)
+        private IConfiguration _configManager;
+        public AccountController(IUserRepository repo,IJwtAuthenticationManager jwtManager,IConfiguration configuration)
         {
             _repo = repo;
             _jwtMananager = jwtManager;
+            _configManager = configuration;
         }
 
         [HttpGet]
@@ -59,15 +63,21 @@ namespace Coding_Test.Controllers
             try
             {
                 var result = _repo.SignIn(model);
-                if (result == RepoResult.Success) return StatusCode(200,  new ResponseDto<LoginResponse>() { 
-                    message = "sign in successful",
-                    status = 200,
-                    data= new LoginResponse
+                if (result == RepoResult.Success)
+                {
+                    var newRefreshToken = _repo.ResetRefreshToken(model.Email);
+                    return StatusCode(200, new ResponseDto<LoginResponse>()
                     {
-                        Token= _jwtMananager.GetToken(model)
-                    }
+                        message = "sign in successful",
+                        status = 200,
+                        data = new LoginResponse
+                        {
+                            RefreshToken=newRefreshToken,
+                            Token = _jwtMananager.GetToken(model.Email)
+                        }
+                    });
 
-                });
+                }
 
                 if(result == RepoResult.NotExist)   return BadRequest(new ResponseDto<string>() { status = 400, message = "{\"email\":\"email does not exist\"}" });
 
@@ -78,6 +88,39 @@ namespace Coding_Test.Controllers
                 return StatusCode(500, new ResponseDto<string>() { status = 500, message = "{\"summary\":\"internal server error\"}" });
 
             }
+        }
+
+        [HttpPost("refreshToken")]
+        public ActionResult RefreshToken([FromBody] LoginResponse token)
+        {
+            try
+            {
+                var claim = _jwtMananager.GetPrincipalFromExpiredToken(token.Token, _configManager["CondingTestTokenKey:jwtKey"]);
+                var refreshToken = _repo.GetRefreshToken(claim.Identity.Name);
+                var newJwt = _jwtMananager.RefreshJwt(claim.Identity.Name, token.RefreshToken, refreshToken);
+                var newRefreshToken = _repo.ResetRefreshToken(claim.Identity.Name);
+
+                return StatusCode(200, new ResponseDto<LoginResponse>
+                {
+                    status = 200,
+                    message = "code refresh successfull",
+                    data = new LoginResponse{
+                                RefreshToken=newRefreshToken,
+                                Token= newJwt
+                           }
+                });
+            }
+            catch(SecurityTokenException)
+            {
+                return StatusCode(400, new ResponseDto<string> { status = 400, message = "invalid refresh token" });
+            }
+            catch
+            {
+                return StatusCode(500, new ResponseDto<string> { status = 500, message = "internal server error" });
+            }
+            
+
+
         }
     }
 }
