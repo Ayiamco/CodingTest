@@ -6,4 +6,4 @@
 - On the react client create an .env file and add this key value pair to it **REACT_APP_API_URL=https://localhost:44339/api**
 
 
-Seeded users can be found in the ~/Infrastructure/CodingTestContext.cs file.
+Seeded users can be found in the ~/Infrastructure/CodingTestContext.cs file. 
