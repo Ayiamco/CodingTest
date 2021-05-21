@@ -12,9 +12,9 @@ namespace Coding_Test.Infrastructure
     {
         public AutoMapperProfile()
         {
-            CreateMap<RegisterDto, User>()
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.Now))
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.Now));
+            //CreateMap<RegisterDto, ApplicationUser>()
+            //    .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.Now))
+            //    .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.Now));
         }
         
     }

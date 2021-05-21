@@ -2,7 +2,7 @@ import React,{useEffect,useCallback,useState} from 'react';
 import {useHistory} from "react-router-dom";
 import  Header from "../components/header";
 import Footer from "../components/footer";
-import { getDetails } from '../apis/user';
+import { getDetails,tryRefreshToken } from '../apis/user';
 import Spinner from "../components/spinner"
 
 export default function DetailsPage () {
@@ -10,11 +10,16 @@ export default function DetailsPage () {
     const history=useHistory();
     const callback=useCallback( async ()=>{
         let resp=await getDetails();
-        console.log(resp);
         if(resp.status===200) setDetails(resp.data);
         else if(resp.status===401){
-            localStorage.setItem("returnUrl","/details")
-            history.push("/");
+            resp=await tryRefreshToken();
+            if(resp == 200) history.push("/details");
+            else{
+                history.push("/");
+                 localStorage.setItem("returnUrl","/details")
+            }
+           
+            
             return;
         }
     })

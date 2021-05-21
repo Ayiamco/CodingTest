@@ -2,6 +2,7 @@
 using Coding_Test.Infrastructure;
 using Coding_Test.Interfaces;
 using Coding_Test.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Coding_Test.Entities;
+using Newtonsoft.Json;
 
 namespace Coding_Test.Controllers
 {
@@ -17,14 +20,20 @@ namespace Coding_Test.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private IUserRepository _repo;
         private IJwtAuthenticationManager _jwtMananager;
+        private IUserRepository _repo;
         private IConfiguration _configManager;
-        public AccountController(IUserRepository repo,IJwtAuthenticationManager jwtManager,IConfiguration configuration)
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
+        public AccountController(IJwtAuthenticationManager jwtManager,IUserRepository repo,
+            IConfiguration configuration, UserManager<ApplicationUser> userManager,RoleManager<ApplicationRole> roleManager, SignInManager<ApplicationUser> signInManager)
         {
             _repo = repo;
             _jwtMananager = jwtManager;
             _configManager = configuration;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         [HttpGet]
@@ -39,56 +48,54 @@ namespace Coding_Test.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            try
-            {
-                var result = await _repo.CreateAsync(user);
-                if (result != null) 
+            //try
+            //{
+                var result = await _userManager.CreateAsync( new ApplicationUser { UserName=user.Email, Email=user.Email,Name=user.Name},user.Password );
+                if (result.Succeeded) 
                 return StatusCode(201,
                     new ResponseDto<string>() { message="user created successfully", status = 201 });
 
-                return BadRequest(new ResponseDto<string>() { status = 400, message = "user already exist" });
-            }
-            catch
-            {
-                return StatusCode(500, new ResponseDto<string>() { status = 500, message = "internal server error" });
+            
+            return BadRequest(new ResponseDto<string>() { status = 400, message = AddErrors(result.Errors) });
+            //}
+            //catch
+            //{
+            //    return StatusCode(500, new ResponseDto<string>() { status = 500, message = "internal server error" });
 
-            }
+            //}
         }
 
         [HttpPost("login")]
-        public ActionResult Login([FromBody] UserLoginDto model)
+        public async Task<ActionResult> Login([FromBody] UserLoginDto model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(new ResponseDto<string>() { message = "{\"email\":\"form data failed validation\"}", status = 400 });
 
-            try
+            var result= await _signInManager.PasswordSignInAsync(model.Email, model.Password, false,lockoutOnFailure:false);
+            if (result.Succeeded)
             {
-                var result = _repo.SignIn(model);
-                if (result == RepoResult.Success)
+                var newRefreshToken = _repo.ResetRefreshToken(model.Email);
+                return StatusCode(200, new ResponseDto<AuthResponse>()
                 {
-                    var newRefreshToken = _repo.ResetRefreshToken(model.Email);
-                    return StatusCode(200, new ResponseDto<AuthResponse>()
+                    message = "sign in successful",
+                    status = 200,
+                    data = new AuthResponse
                     {
-                        message = "sign in successful",
-                        status = 200,
-                        data = new AuthResponse
-                        {
-                            RefreshToken=newRefreshToken,
-                            Token = _jwtMananager.GetToken(model.Email)
-                        }
-                    });
-
-                }
-
-                if(result == RepoResult.NotExist)   return BadRequest(new ResponseDto<string>() { status = 400, message = "{\"email\":\"email does not exist\"}" });
-
-                return BadRequest(new ResponseDto<string>() { status = 400, message = "{\"password\":\"password is incorrect\"}" });
-            }
-            catch(Exception e)
-            {
-                return StatusCode(500, new ResponseDto<string>() { status = 500, message = "{\"summary\":\"internal server error\"}" });
+                        RefreshToken=newRefreshToken,
+                        Token = _jwtMananager.GetToken(model.Email)
+                    }
+                });
 
             }
+
+            return BadRequest(new ResponseDto<string>() { status = 400, message = "" });;
+
+            
+            //catch
+            //{
+            //    return StatusCode(500, new ResponseDto<string>() { status = 500, message = "{\"summary\":\"internal server error\"}" });
+
+            //}
         }
 
         [HttpPost("refreshToken")]
@@ -122,6 +129,17 @@ namespace Coding_Test.Controllers
             
 
 
+        }
+
+        private string AddErrors(IEnumerable<IdentityError> errors)
+        {
+            var dict = new Dictionary<string, string>();
+            foreach(var error in errors)
+            {
+                dict.Add( error.Code,error.Description);
+            }
+            string json = JsonConvert.SerializeObject(dict, Formatting.Indented);
+            return json;
         }
     }
 }

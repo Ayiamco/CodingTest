@@ -23,6 +23,7 @@ namespace Coding_Test.Infrastructure
 
         public string GetToken(string _userEmail)
         {
+           
             //create security token handler
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.ASCII.GetBytes(encryptionKey);
@@ -62,7 +63,7 @@ namespace Coding_Test.Infrastructure
                 ValidateAudience = false, //you might want to validate the audience and issuer depending on your use case
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
                 ValidateLifetime = false //here we are saying that we don't care about the token's expiration date
             };
 
@@ -76,9 +77,5 @@ namespace Coding_Test.Infrastructure
             return principal;
         }
 
-        //private string GetRefreshTokenFromDb()
-        //{
-
-        //}
     }
 }

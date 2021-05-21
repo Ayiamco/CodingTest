@@ -8,7 +8,6 @@ namespace Coding_Test.Interfaces
 {
     public interface IUserRepository
     {
-        Task<User> CreateAsync(RegisterDto dto);
 
         RepoResult SignIn(UserLoginDto dto);
         public string ResetRefreshToken(string userEmail);

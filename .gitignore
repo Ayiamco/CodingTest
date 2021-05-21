@@ -2,3 +2,4 @@
 /obj
 /codingtest-reactclient/node_modules
 .vs
+.env

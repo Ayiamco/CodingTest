@@ -15,6 +15,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Coding_Test.Interfaces;
 using Coding_Test.Repositories;
+using Coding_Test.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace Coding_Test
 {
@@ -30,8 +32,17 @@ namespace Coding_Test
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) 
         {
-            services.AddDbContext<CodingTestContext>(options =>
+            services.AddDbContext<ApplicationDbContext>(options =>
                        options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddIdentity<ApplicationUser,ApplicationRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.User.RequireUniqueEmail = false;
+            });
 
             //allow react app
             services.AddCors(options =>
@@ -48,6 +59,7 @@ namespace Coding_Test
 
             //add the jwt interface to enable injection
             var key = Configuration[AppConstants.JwtKey]; //this is the key used during the hashing 
+
 
             services.AddAuthentication(x =>
             {
@@ -70,10 +82,9 @@ namespace Coding_Test
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddControllers();
-            //services.AddSwaggerGen(c =>
-            //{
-            //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "LaundryApi", Version = "v1" });
-            //});
+
+            //seed data
+             HelperMethods.SeedData();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -85,6 +96,12 @@ namespace Coding_Test
                 //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "LaundryApi v1"));
                 app.UseDeveloperExceptionPage();
             }
+            app.Use( async(context,next)=> 
+            {
+
+                await next();
+            }
+            );
 
             app.UseHttpsRedirection();
 
